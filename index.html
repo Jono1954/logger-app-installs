@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a1628">
+<title>Download Logger for Android</title>
+<style>
+  :root {
+    --bg: #0a1628;
+    --card: #12233d;
+    --card-border: #1e3a5f;
+    --text: #f4f7fb;
+    --muted: #9bb0c9;
+    --green: #16a34a;
+    --green-hover: #15803d;
+    --badge: #1d4ed8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 500px at 50% -80px, #16345c 0%, transparent 70%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: 2rem 1.1rem 2.5rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1.6rem 1.35rem 1.4rem;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+  .shield {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+  }
+  h1 {
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .badge {
+    display: inline-block;
+    margin: 0.35rem 0 1.1rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background: var(--badge);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .download {
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    background: var(--green);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 0.95rem 1rem 0.55rem;
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.28);
+  }
+  .download:hover, .download:focus {
+    background: var(--green-hover);
+  }
+  .download small {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0.92;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0.85rem 0 1.25rem;
+  }
+  h2 {
+    font-size: 0.95rem;
+    margin: 0 0 0.45rem;
+    color: var(--text);
+  }
+  ol {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  ol li { margin: 0.35rem 0; }
+  ol b { color: var(--text); }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="brand">
+        <svg class="shield" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#1d4ed8"
+            d="M24 4l16 6v12c0 10.5-6.6 20.2-16 24-9.4-3.8-16-13.5-16-24V10l16-6z"/>
+          <path fill="#93c5fd"
+            d="M24 10.5l-9 3.4v8.1c0 6.8 4.2 13.1 9 15.6 4.8-2.5 9-8.8 9-15.6v-8.1l-9-3.4z"/>
+        </svg>
+        <h1>LOGGER — Professional Survey Fieldbook for Android</h1>
+      </div>
+      <div class="badge">Version <!--VERSION-->01.11.2026<!--/VERSION--></div>
+      <a class="download" id="download-apk"
+        href="https://dl.dropboxusercontent.com/scl/fi/la3fdda9blyxnw90snj48/Latest-Logger-Version.apk?rlkey=a6yvg8vvaefdhf32ey30gtmyf&amp;dl=1">
+        Download Logger APK
+        <small>Android installation package</small>
+      </a>
+      <p class="meta">Approximately <!--SIZE_MB-->170<!--/SIZE_MB--> MB · Android 6.0 or later</p>
+      <h2>Installation</h2>
+      <ol>
+        <li>Tap <b>Download Logger APK</b>.</li>
+        <li>If Chrome says the file might be harmful, tap
+          <b>Download anyway</b>.</li>
+        <li>If it asks to download again, tap <b>Cancel</b> — the first
+          download is already running.</li>
+        <li>When the download finishes, tap the file and tap
+          <b>Install</b> (or <b>Upgrade</b>).</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>
