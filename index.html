@@ -127,6 +127,10 @@
       <p class="hint">If Logger is already on the phone, do not
         uninstall it. Android will offer <b>Upgrade</b> and keep
         jobs and licence.</p>
+      <p class="hint">If Logger is already on the phone, it may open
+        briefly to remove old Logger APKs, then the download starts.
+        If Chrome asks <b>Download file again</b>, open Logger once
+        and tap Download again.</p>
       <ol>
         <li>Select <b>Download Logger App</b>.</li>
         <li>If the install says The file might be harmful, select
@@ -138,10 +142,39 @@
         Download Logger App
       </a>
       <div class="after-download">
-        <div class="badge">Version <!--VERSION-->02.11.2026-01<!--/VERSION--></div>
+        <div class="badge">Version <!--VERSION-->03.11.2026-01<!--/VERSION--></div>
         <p class="meta">Approximately <!--SIZE_MB-->169<!--/SIZE_MB-->MB</p>
       </div>
     </section>
   </main>
+  <script>
+(function () {
+  var link = document.getElementById('download-apk');
+  if (!link) return;
+  link.addEventListener('click', function (event) {
+    var apkUrl = link.getAttribute('href');
+    if (!apkUrl) return;
+    event.preventDefault();
+    var appOpened = false;
+    function markHidden() {
+      if (document.hidden) appOpened = true;
+    }
+    function markPageHide() {
+      appOpened = true;
+    }
+    document.addEventListener('visibilitychange', markHidden);
+    window.addEventListener('pagehide', markPageHide);
+    var deepLink = 'logger://clean-and-download?u=' +
+      encodeURIComponent(apkUrl);
+    window.location.href = deepLink;
+    setTimeout(function () {
+      document.removeEventListener('visibilitychange', markHidden);
+      window.removeEventListener('pagehide', markPageHide);
+      if (appOpened || document.hidden) return;
+      window.location.href = apkUrl;
+    }, 1200);
+  });
+})();
+  </script>
 </body>
 </html>
