@@ -18,6 +18,8 @@
     --green: #16a34a;
     --green-hover: #15803d;
     --badge: #1d4ed8;
+    --close: #0D47A1;
+    --close-hover: #0a3a82;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -84,6 +86,8 @@
     border-radius: 14px;
     padding: 0.95rem 1rem;
     box-shadow: 0 8px 20px rgba(22, 163, 74, 0.28);
+    border: none;
+    cursor: pointer;
   }
   .download:hover, .download:focus {
     background: var(--green-hover);
@@ -112,6 +116,60 @@
     text-align: center;
     margin: 0;
   }
+  .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 1.1rem;
+    gap: 0.75rem;
+  }
+  .close-btn {
+    background: var(--close);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(13, 71, 161, 0.35);
+  }
+  .close-btn:hover, .close-btn:focus {
+    background: var(--close-hover);
+  }
+  .close-fail {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 0.55rem 0 0;
+    text-align: right;
+  }
+  .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: rgba(5, 12, 24, 0.72);
+  }
+  .modal[hidden] { display: none; }
+  .modal-card {
+    width: 100%;
+    max-width: 18rem;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.35rem 1.2rem;
+    text-align: center;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  }
+  .modal-card p {
+    margin: 0;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -127,55 +185,137 @@
         <h1>LOGGER - Professional Field Survey App</h1>
       </div>
       <h2>Installation</h2>
-      <p class="hint">If Logger is already on the phone, do not
-        uninstall it. Android will offer <b>Upgrade</b> and keep
-        jobs and licence.</p>
-      <p class="hint">If Logger is already on the phone, it may open
-        briefly to remove old Logger APKs, then the download starts.
-        If Chrome asks <b>Download file again</b>, open Logger once
-        and tap Download again.</p>
+      <p class="hint"><b>New phone (Logger not installed):</b>
+        Select Download Logger App. Install when the file finishes.</p>
+      <p class="hint"><b>Logger already on the phone:</b>
+        Do not uninstall. Select Download Logger App — Logger opens
+        and upgrades inside the app (jobs and licence stay). Do not
+        use this page to sideload an upgrade in Chrome.</p>
       <ol>
         <li>Select <b>Download Logger App</b>.</li>
         <li>If the install says The file might be harmful, select
           <b>Download anyway</b>.</li>
-        <li>When the download finishes, select the downloaded file
-          name and tap <b>Install</b> or <b>Upgrade</b>.</li>
+        <li>When the download finishes (new phone), select the file
+          and tap <b>Install</b>.</li>
       </ol>
-      <a class="download" id="download-apk" href="https://dl.dropboxusercontent.com/scl/fi/la3fdda9blyxnw90snj48/Latest-Logger-Version.apk?rlkey=a6yvg8vvaefdhf32ey30gtmyf&amp;dl=1">
+      <a class="download" id="download-apk"
+        href="https://dl.dropboxusercontent.com/scl/fi/la3fdda9blyxnw90snj48/Latest-Logger-Version.apk?rlkey=a6yvg8vvaefdhf32ey30gtmyf&amp;dl=1">
         Download Logger App
       </a>
+      <p class="meta" id="download-hint" hidden>Download started…</p>
       <div class="after-download">
         <div class="badge">Version <!--VERSION-->03.11.2026-03<!--/VERSION--></div>
         <p class="meta">Approximately <!--SIZE_MB-->169<!--/SIZE_MB-->MB</p>
       </div>
+      <div class="footer-row">
+        <button type="button" class="close-btn" id="close-page">Close</button>
+      </div>
+      <p class="close-fail" id="close-fail" hidden>
+        This tab could not be closed automatically — use the browser X
+        / Recents to close it.
+      </p>
     </section>
   </main>
+
+  <div class="modal" id="checking-modal" hidden role="dialog"
+    aria-modal="true" aria-labelledby="checking-text">
+    <div class="modal-card">
+      <p id="checking-text">Checking available Logger versions…</p>
+    </div>
+  </div>
+
+  <iframe id="apk-download-frame" title="Logger APK download"
+    style="position:absolute;width:0;height:0;border:0;visibility:hidden"
+    aria-hidden="true"></iframe>
+
   <script>
 (function () {
   var link = document.getElementById('download-apk');
+  var hint = document.getElementById('download-hint');
+  var frame = document.getElementById('apk-download-frame');
+  var modal = document.getElementById('checking-modal');
+  var closeBtn = document.getElementById('close-page');
+  var closeFail = document.getElementById('close-fail');
   if (!link) return;
+
+  function showModal() {
+    if (modal) modal.hidden = false;
+  }
+  function hideModal() {
+    if (modal) modal.hidden = true;
+  }
+  function showCloseFail() {
+    if (closeFail) closeFail.hidden = false;
+  }
+  function tryCloseTab() {
+    try {
+      window.close();
+    } catch (e) { /* ignore */ }
+    // Browsers often ignore close for tabs not opened by script.
+    setTimeout(function () {
+      if (!window.closed) showCloseFail();
+    }, 400);
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      tryCloseTab();
+    });
+  }
+
   link.addEventListener('click', function (event) {
     var apkUrl = link.getAttribute('href');
     if (!apkUrl) return;
     event.preventDefault();
+    if (closeFail) closeFail.hidden = true;
+    showModal();
+
     var appOpened = false;
-    function markHidden() {
-      if (document.hidden) appOpened = true;
+    var finished = false;
+
+    function finishLoggerTrack() {
+      if (finished) return;
+      finished = true;
+      cleanup();
+      hideModal();
+      tryCloseTab();
     }
-    function markPageHide() {
+
+    function markOpened() {
       appOpened = true;
+      finishLoggerTrack();
     }
+    function markHidden() {
+      if (document.hidden) markOpened();
+    }
+    function cleanup() {
+      document.removeEventListener('visibilitychange', markHidden);
+      window.removeEventListener('pagehide', markOpened);
+      window.removeEventListener('blur', markOpened);
+    }
+
     document.addEventListener('visibilitychange', markHidden);
-    window.addEventListener('pagehide', markPageHide);
+    window.addEventListener('pagehide', markOpened);
+    window.addEventListener('blur', markOpened);
+
     var deepLink = 'logger://clean-and-download?u=' +
       encodeURIComponent(apkUrl);
     window.location.href = deepLink;
+
     setTimeout(function () {
-      document.removeEventListener('visibilitychange', markHidden);
-      window.removeEventListener('pagehide', markPageHide);
-      if (appOpened || document.hidden) return;
-      window.location.href = apkUrl;
-    }, 1200);
+      if (finished || appOpened || document.hidden) return;
+      finished = true;
+      cleanup();
+      hideModal();
+      // First install: download without navigating to blank Dropbox.
+      if (frame) frame.src = apkUrl;
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent =
+          'Download started — you can close this tab.';
+      }
+      tryCloseTab();
+    }, 2500);
   });
 })();
   </script>
