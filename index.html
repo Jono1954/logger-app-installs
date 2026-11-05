@@ -186,17 +186,18 @@
       </div>
       <h2>Installation</h2>
       <p class="hint"><b>New phone (Logger not installed):</b>
-        Select Download Logger App. Install when the file finishes.</p>
+        Select Download Logger App. When the file finishes, tap it
+        and choose Install.</p>
       <p class="hint"><b>Logger already on the phone:</b>
-        Do not uninstall. Select Download Logger App — Logger opens
-        and upgrades inside the app (jobs and licence stay). Do not
-        use this page to sideload an upgrade in Chrome.</p>
+        Do not uninstall. Select Download Logger App. If Logger
+        opens, stay there (jobs and licence stay). If Logger does
+        not open, install the downloaded file over the current app.</p>
       <ol>
         <li>Select <b>Download Logger App</b>.</li>
         <li>If the install says The file might be harmful, select
           <b>Download anyway</b>.</li>
-        <li>When the download finishes (new phone), select the file
-          and tap <b>Install</b>.</li>
+        <li>When the download finishes, select the file and tap
+          <b>Install</b> or <b>Update</b>.</li>
       </ol>
       <a class="download" id="download-apk" href="https://dl.dropboxusercontent.com/scl/fi/la3fdda9blyxnw90snj48/Latest-Logger-Version.apk?rlkey=a6yvg8vvaefdhf32ey30gtmyf&amp;dl=1">
         Download Logger App
@@ -223,7 +224,7 @@
     </div>
   </div>
 
-  <iframe id="apk-download-frame" title="Logger APK download"
+  <iframe id="apk-download-frame" title="Logger upgrade link"
     style="position:absolute;width:0;height:0;border:0;visibility:hidden"
     aria-hidden="true"></iframe>
 
@@ -237,9 +238,6 @@
   var closeFail = document.getElementById('close-fail');
   if (!link) return;
 
-  function showModal() {
-    if (modal) modal.hidden = false;
-  }
   function hideModal() {
     if (modal) modal.hidden = true;
   }
@@ -267,54 +265,29 @@
     if (!apkUrl) return;
     event.preventDefault();
     if (closeFail) closeFail.hidden = true;
-    showModal();
 
-    var appOpened = false;
-    var finished = false;
+    // Same tap starts the file. Navigating this page to logger://
+    // left the checking dialog up when the phone has no handler.
+    var download = document.createElement('a');
+    download.href = apkUrl;
+    download.rel = 'noopener';
+    document.body.appendChild(download);
+    download.click();
+    download.remove();
 
-    function finishLoggerTrack() {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      hideModal();
-      tryCloseTab();
+    hideModal();
+    if (hint) {
+      hint.hidden = false;
+      hint.textContent =
+        'Download started — you can close this tab.';
     }
 
-    function markOpened() {
-      appOpened = true;
-      finishLoggerTrack();
+    // Hidden frame only. A current Logger can still open. An older
+    // app leaves this page on screen with the download already going.
+    if (frame) {
+      frame.src = 'logger://clean-and-download?u=' +
+        encodeURIComponent(apkUrl);
     }
-    function markHidden() {
-      if (document.hidden) markOpened();
-    }
-    function cleanup() {
-      document.removeEventListener('visibilitychange', markHidden);
-      window.removeEventListener('pagehide', markOpened);
-      window.removeEventListener('blur', markOpened);
-    }
-
-    document.addEventListener('visibilitychange', markHidden);
-    window.addEventListener('pagehide', markOpened);
-    window.addEventListener('blur', markOpened);
-
-    var deepLink = 'logger://clean-and-download?u=' +
-      encodeURIComponent(apkUrl);
-    window.location.href = deepLink;
-
-    setTimeout(function () {
-      if (finished || appOpened || document.hidden) return;
-      finished = true;
-      cleanup();
-      hideModal();
-      // First install: download without navigating to blank Dropbox.
-      if (frame) frame.src = apkUrl;
-      if (hint) {
-        hint.hidden = false;
-        hint.textContent =
-          'Download started — you can close this tab.';
-      }
-      tryCloseTab();
-    }, 2500);
   });
 })();
   </script>
